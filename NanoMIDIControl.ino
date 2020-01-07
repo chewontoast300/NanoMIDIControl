@@ -4,7 +4,7 @@
   Last Revision 2020-10-07
 	Oled 128x32 display connected to i2c bus
 */
-float versionNumber = 0.05; //For tracking versions
+float versionNumber = 0.051; //For tracking versions
 
 #include <SPI.h>
 #include <Wire.h>
