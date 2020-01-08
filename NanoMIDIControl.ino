@@ -238,6 +238,22 @@ void menuSelections() {
   
 }
 
+void printMatrix() {
+    for (int rowIndex=0; rowIndex < rowCount; rowIndex++) {
+        if (rowIndex < 10)
+            Serial.print(F("0"));
+        Serial.print(rowIndex); Serial.print(F(": "));
+ 
+        for (int colIndex=0; colIndex < colCount; colIndex++) {  
+            Serial.print(keys[colIndex][rowIndex]);
+            if (colIndex < colCount)
+                Serial.print(F(", "));
+        }   
+        Serial.println("");
+    }
+    Serial.println("");
+}
+
     // D07 Maps controls for us in Menu Screen
 void menuControls() {
   
@@ -245,21 +261,26 @@ void menuControls() {
 
 //-------------------- Display Functions End -----------------//
 
-void setup() {
-    Serial.begin(115200);
-    Serial.println("Starting Up Nano Midi");
-    Serial.print("V:");
-    Serial.println(versionNumber);
-    showInit();
-    readAllThePots(pots);
-    delay(3000); // for showing message
-    setPins();
-    screenUpdate();
-    Serial.println("End Setup");
+//------------------- Controls Function Start ----------------//
+
+void scanPots(struct Pot * pot) {
+    for(int i = 0; i < potCount; i++) {
+        int reading = map(analogRead(pot[i].pin), 0, 664, 0, 200);
+
+        if(abs(reading - pot[i].lastReading) >= pot[i].threshold) {
+            //screenChanged = true;
+            userInput = true;
+            pot[i].currentReading = (reading/2);
+            potRead = i;
+            potValue = (reading/2);
+            //previousMillis = start;
+            displayUserInput();
+            pot[i].lastReading = reading;
+        }
+    }
 }
 
-
-void readMatrix() {
+void scanMatrix() {
     // iterate the columns
     for (int colIndex=0; colIndex < colCount; colIndex++) {
         // col: set to output to low
@@ -278,59 +299,44 @@ void readMatrix() {
         pinMode(curCol, INPUT);
     }
 }
- 
-void printMatrix() {
-    for (int rowIndex=0; rowIndex < rowCount; rowIndex++) {
-        if (rowIndex < 10)
-            Serial.print(F("0"));
-        Serial.print(rowIndex); Serial.print(F(": "));
- 
-        for (int colIndex=0; colIndex < colCount; colIndex++) {  
-            Serial.print(keys[colIndex][rowIndex]);
-            if (colIndex < colCount)
-                Serial.print(F(", "));
-        }   
-        Serial.println("");
-    }
-    Serial.println("");
-}
 
-void readAllThePots(struct Pot * pot) {
-    for(int i = 0; i < potCount; i++) {
-        int reading = map(analogRead(pot[i].pin), 0, 664, 0, 200);
+//-------------------- Controls Function End -----------------//
 
-        if(abs(reading - pot[i].lastReading) >= pot[i].threshold) {
-            //screenChanged = true;
-            userInput = true;
-            pot[i].currentReading = (reading/2);
-            potRead = i;
-            potValue = (reading/2);
-            //previousMillis = start;
-            displayUserInput();
-            pot[i].lastReading = reading;
-        }
-    }
+void setup() {
+    Serial.begin(115200);
+    Serial.println("Starting Up Nano Midi");
+    Serial.print("V:");
+    Serial.println(versionNumber);
+    showInit();
+    scanPots(pots);
+    delay(3000); // for showing message
+    setPins();
+    screenUpdate();
+    Serial.println("End Setup");
 }
 
 void loop() {
-  //unsigned long currentMillis = millis();
-  screenUpdate();
-  /*
+  
+  //screenUpdate(); //for testing
+
+      // Check for activity before updating anything on screen
   if (screenChanged == true) {
     screenUpdate();
   }
-  */
-  //For MIDI Controller
 
-    readAllThePots(pots);
-    delay(10);
+      // Scan buttons and Pots for activity
+    scanPots(pots);
+    scanMatrix();
+    
+    delay(10); // delay to keep loop from cycling too fast
+
   /*
-  readMatrix();
+  scanMatrix();
   printMatrix();
   delay(100);
   */
 /* 
-	readMatrix();
+	scanMatrix();
     if (Serial.read()=='!')
         printMatrix();
 */
