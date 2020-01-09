@@ -87,25 +87,28 @@ void showInit()
   display.print(versionNumber);
   display.setCursor(18, 20);
   display.print("Initialising");
+  display.display();
   delay(1000);
   display.print(".");
+  display.display();
   delay(1000);
   display.print(".");
+  display.display();
   delay(1000);
   display.print(".");
-  display.display();  // Print everything we set previously
+  display.display();
 }
 
-    // D02 Function for controlling when screen needs to be changed. Keeps from having to refresh all the time.
+    // D02 Function for controlling when screen needs to be changed.
+    // Keeps us from having to refresh all the time.
 void screenUpdate() {
-  // keeps screen from refreshing if not needed
     display.clearDisplay();
     if (false == menuOn) {
       printMainScreen();
     } else {
       printMenuScreen();
     }
-    display.display();  // Print everything we set previously
+    display.display();
     screenChanged = false;
 }
 
@@ -319,14 +322,14 @@ void loop() {
   
   //screenUpdate(); //for testing
 
+      // Scan buttons and Pots for activity
+    scanPots(pots);
+    scanMatrix();
+    
       // Check for activity before updating anything on screen
   if (screenChanged == true) {
     screenUpdate();
   }
-
-      // Scan buttons and Pots for activity
-    scanPots(pots);
-    scanMatrix();
     
     delay(10); // delay to keep loop from cycling too fast
 
