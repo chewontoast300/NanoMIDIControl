@@ -255,6 +255,7 @@ void printMatrix() {
         Serial.println("");
     }
     Serial.println("");
+    delay(500);
 }
 
     // D07 Maps controls for us in Menu Screen
@@ -312,7 +313,7 @@ void setup() {
     Serial.println(versionNumber);
     showInit();
     scanPots(pots);
-    delay(3000); // for showing message
+    delay(2000); // for showing message
     setPins();
     screenUpdate();
     Serial.println("End Setup");
@@ -325,11 +326,11 @@ void loop() {
       // Scan buttons and Pots for activity
     scanPots(pots);
     scanMatrix();
-    
+    printMatrix();
       // Check for activity before updating anything on screen
-  if (screenChanged == true) {
+//  if (screenChanged == true) {
     screenUpdate();
-  }
+//  }
     
     delay(10); // delay to keep loop from cycling too fast
 
