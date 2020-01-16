@@ -4,7 +4,7 @@
   Last Revision 2020-10-07
 	Oled 128x32 display connected to i2c bus
 */
-float versionNumber = 0.051; //For tracking versions
+float versionNumber = 0.06; //For tracking versions
 
 #include <SPI.h>
 #include <Wire.h>
@@ -88,13 +88,13 @@ void showInit()
   display.setCursor(18, 20);
   display.print("Initialising");
   display.display();
-  delay(1000);
+  delay(600);
   display.print(".");
   display.display();
-  delay(1000);
+  delay(600);
   display.print(".");
   display.display();
-  delay(1000);
+  delay(600);
   display.print(".");
   display.display();
 }
