@@ -32,6 +32,7 @@ const int rowCount = sizeof(ROWS)/sizeof(ROWS[0]);
 int COLS[3] = {10,11,12};
 const int colCount = sizeof(COLS)/sizeof(COLS[0]);
 byte keys[colCount][rowCount];
+//static int8_t debounce_count[colCount][rowCount];
 // bounce buttonDebounce[colCount][rowCount];
  char keyMap[colCount][rowCount] = {
   {'C',"C#",'D',"Eb",'E','F',"F#",'G'},
