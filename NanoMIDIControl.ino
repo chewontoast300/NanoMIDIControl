@@ -1,12 +1,12 @@
 /*
 	Arduino Nano Midi Controller
 	Created by avalois2@protonmail.com on 2019-05-28
-  Last Revision 2020-10-07
 	Oled 128x32 display connected to i2c bus
 */
 float versionNumber = 0.06; //For tracking versions
 
 #include <SPI.h>
+#include <Bounce2.h>
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
@@ -32,6 +32,12 @@ const int rowCount = sizeof(ROWS)/sizeof(ROWS[0]);
 int COLS[3] = {10,11,12};
 const int colCount = sizeof(COLS)/sizeof(COLS[0]);
 byte keys[colCount][rowCount];
+// bounce buttonDebounce[colCount][rowCount];
+ char keyMap[colCount][rowCount] = {
+  {'C',"C#",'D',"Eb",'E','F',"F#",'G'},
+  {"Ab",'A',"Bb",'B',"X1","X2","X3","Y1"},
+  {"Y2","Y3",0,0,0,0,0,0},
+};
 int POTS[2] = {A6,A7};
 const int potCount = sizeof(POTS)/sizeof(POTS[0]);
 struct Pot {
@@ -119,11 +125,12 @@ void displayUserInput() {
         userInput = false;
         previousMillis = currentMillis;
        } else {
-        Serial.println("printing input text");
+        //Serial.println("printing input text");
         display.setTextColor(WHITE);
         display.setTextSize(2);
         display.setCursor(10,14); //set cursor to Button display
-      // display Button Output
+        //display.print(keyMap[colIndex][rowIndex]);// display Button Output
+        printMatrix();
         display.setTextSize(0);
         display.setCursor(60,12); //set cursor to Pot display
         display.println(potRead);
@@ -243,12 +250,11 @@ void menuSelections() {
 
 void printMatrix() {
     for (int rowIndex=0; rowIndex < rowCount; rowIndex++) {
-        if (rowIndex < 10)
-            Serial.print(F("0"));
-        Serial.print(rowIndex); Serial.print(F(": "));
- 
+        //Serial.print(rowIndex); Serial.print(F(": "));
         for (int colIndex=0; colIndex < colCount; colIndex++) {  
-            Serial.print(keys[colIndex][rowIndex]);
+            //Serial.print(keys[colIndex][rowIndex]);
+            Serial.print(keyMap[colIndex][rowIndex]);
+            //display.print(keyMap[colIndex][rowIndex]);
             if (colIndex < colCount)
                 Serial.print(F(", "));
         }   
@@ -256,11 +262,6 @@ void printMatrix() {
     }
     Serial.println("");
     delay(500);
-}
-
-    // D07 Maps controls for us in Menu Screen
-void menuControls() {
-  
 }
 
 //-------------------- Display Functions End -----------------//
@@ -278,7 +279,7 @@ void scanPots(struct Pot * pot) {
             potRead = i;
             potValue = (reading/2);
             //previousMillis = start;
-            displayUserInput();
+            //displayUserInput();
             pot[i].lastReading = reading;
         }
     }
@@ -297,11 +298,23 @@ void scanMatrix() {
             byte rowCol = ROWS[rowIndex];
             pinMode(rowCol, INPUT_PULLUP);
             keys[colIndex][rowIndex] = digitalRead(rowCol);
+            keyMap[colIndex][rowIndex] = digitalRead(rowCol);
+              //Let's try setting the key pressed variable here if found to be low
+            //if (digitalRead(rowCol) = 0) {
+              //keyMap[colIndex][rowIndex] = keys[colIndex][rowIndex];
+              
+            //  userInput = true;
+            //}
             pinMode(rowCol, INPUT);
         }
         // disable the column
         pinMode(curCol, INPUT);
     }
+}
+
+    // Maps controls for use in Menu Screen
+void menuControls() {
+  
 }
 
 //-------------------- Controls Function End -----------------//
@@ -326,11 +339,11 @@ void loop() {
       // Scan buttons and Pots for activity
     scanPots(pots);
     scanMatrix();
-    printMatrix();
+    //printMatrix();
       // Check for activity before updating anything on screen
-//  if (screenChanged == true) {
+  if (userInput == true) {
     screenUpdate();
-//  }
+}
     
     delay(10); // delay to keep loop from cycling too fast
 
